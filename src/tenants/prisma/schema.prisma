@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  nume        String        @db.VarChar(20)
+  prenume      String        @db.VarChar(20)
+  email          String        @unique @db.VarChar(50)
+  parola       String
+  membershipId Int?
+
+  Membership Membership ? @relation(fields: [membershipId ], references: [id], onDelete: Cascade)
+}
+model Membership{
+  id          Int     @id @default(autoincrement()) 
+  tipMembership  TipMembership
+  nr_maxim_intrari_Scrise Int
+  nr_maxim_intrari_Audio Int
+  User             User[]
+}
+
+  enum TipMembership {
+  gratuit
+  standard
+  premium
+  }
+
