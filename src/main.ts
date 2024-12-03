@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { TenantModule } from "./tenants/module/tenant.module";
 import { AppModule } from "./app.module";
-import { OptionsInterceptor } from '../interceptor';
+//import { OptionsInterceptor } from '../interceptor';
 
 console.log('Entering main.ts...'); // Log inițial
 
@@ -15,7 +15,7 @@ async function bootstrap() {
   console.log('CORS enabled');
 
   // Activează interceptorul global
-  app.useGlobalInterceptors(new OptionsInterceptor());
+  //app.useGlobalInterceptors(new OptionsInterceptor());
   console.log('Global interceptors added');
 
   const port = process.env.PORT || 3000;

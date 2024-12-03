@@ -10,6 +10,7 @@ import { PrismaModule } from '../../../tenants/module/prisma.module';
     UserService, // Serviciul principal
     UserBusiness, // Business Layer-ul adăugat
   ],
-  controllers: [UserController], // Controller-ul pentru utilizatori
+  controllers: [UserController],// Controller-ul pentru utilizatori
+  exports: [UserBusiness], 
 })
 export class UserModule {}
