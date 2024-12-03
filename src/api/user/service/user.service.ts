@@ -1,73 +1,52 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../../../tenants/service/tenant.service";
-import { UpdateUserDto } from "../dto/update-user.dto";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../tenants/service/tenant.service';
+import { UserBusiness } from './user.business';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { omit } from 'lodash';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userBusiness: UserBusiness,
+  ) {}
 
   async findAll() {
-    const users = await this.prisma.user.findMany({});
-
-    return users.map((user) => omit(user, ['parola']));  
+    const users = await this.prisma.user.findMany();
+    // Utilizează Business Layer-ul pentru logica suplimentară
+    return users.map((user) => this.userBusiness.sanitizeUser(user));
   }
 
   async findOne(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} was not found.`);
-    }
-    const userWithoutPassword = omit(user, "parola");
-    return userWithoutPassword;
+    // Validează și returnează utilizatorul utilizând Business Layer-ul
+    const user = await this.userBusiness.validateUserExistence(id);
+    return this.userBusiness.sanitizeUser(user);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} was not found.`);
-    }
-
+    // Validează utilizatorul și membership-ul folosind Business Layer-ul
+    const user = await this.userBusiness.validateUserExistence(id);
     const { membershipId, ...data } = updateUserDto;
 
     if (membershipId) {
-      const membership = await this.prisma.membership.findUnique({
-        where: { id: membershipId },
-      });
-
-      if (!membership) {
-        throw new NotFoundException(
-          `Subscription with ID ${membershipId} was not found.`,
-        );
-      }
+      await this.userBusiness.validateMembershipExistence(membershipId);
     }
 
+    // Actualizează datele utilizatorului
     return this.prisma.user.update({
       where: { id },
       data: {
         ...data,
         Membership: membershipId
-          ? { connect: { id: membershipId} }
+          ? { connect: { id: membershipId } }
           : undefined,
       },
     });
   }
 
   async remove(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} was not found.`);
-    }
-
+    // Validează existența utilizatorului și apoi șterge-l
+    await this.userBusiness.validateUserExistence(id);
     await this.prisma.user.delete({ where: { id } });
   }
 }

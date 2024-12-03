@@ -2,21 +2,26 @@ import { NestFactory } from "@nestjs/core";
 import { TenantModule } from "./tenants/module/tenant.module";
 import { AppModule } from "./app.module";
 import { OptionsInterceptor } from '../interceptor';
+
+console.log('Entering main.ts...'); // Log inițial
+
 async function bootstrap() {
+  console.log('Initializing application...');
+
   const app = await NestFactory.create(AppModule);
 
   // Activează CORS
-  /*app.enableCors({
-    origin: 'http://localhost:3001', // Permite accesul doar din frontend-ul React
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Metode HTTP permise
-    credentials: true, // Permite trimiterea cookie-urilor sau a altor credențiale
-  });*/
+  app.enableCors(); // Permite toate originile (sau configurează specific)
+  console.log('CORS enabled');
+
+  // Activează interceptorul global
   app.useGlobalInterceptors(new OptionsInterceptor());
-  app.enableCors(); // Permite toate originile Cross-Origin-Resource-Sharing
+  console.log('Global interceptors added');
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
- /// await app.listen(3000);
-  console.log(`Backend is running on http://localhost:3000`);
+
+  console.log(`Backend is running on http://localhost:${port}`);
 }
+
 bootstrap();
