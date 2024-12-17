@@ -37,9 +37,7 @@ export class UserService {
       where: { id },
       data: {
         ...data,
-        Membership: membershipId
-          ? { connect: { id: membershipId } }
-          : undefined,
+      
       },
     });
   }

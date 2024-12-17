@@ -11,7 +11,4 @@ export class CreateMembershipDto {
 
   @IsNumber()
   nr_maxim_intrari_Audio: number
-
-
- 
 }

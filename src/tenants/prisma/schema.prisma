@@ -13,16 +13,27 @@ model User {
   prenume      String        @db.VarChar(20)
   email          String        @unique @db.VarChar(50)
   parola       String
-  membershipId Int?
 
-  Membership Membership ? @relation(fields: [membershipId ], references: [id], onDelete: Cascade)
+  userSubscription UserSubscription[]
 }
 model Membership{
   id          Int     @id @default(autoincrement()) 
   tipMembership  TipMembership
   nr_maxim_intrari_Scrise Int
   nr_maxim_intrari_Audio Int
-  User             User[]
+
+  userSubscription UserSubscription[]
+}
+model UserSubscription {
+  id                  Int           @id @default(autoincrement()) 
+  userId              Int                                        
+  membershipId  Int                                        
+         
+  createdAt           DateTime            @default(now())        
+  updatedAt           DateTime            @default(now()) @updatedAt 
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membership          Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade)
 }
 
   enum TipMembership {
