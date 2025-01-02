@@ -9,36 +9,59 @@ datasource db {
 
 model User {
   id             Int           @id @default(autoincrement())
-  nume        String        @db.VarChar(20)
-  prenume      String        @db.VarChar(20)
+  nume           String        @db.VarChar(20)
+  prenume        String        @db.VarChar(20)
   email          String        @unique @db.VarChar(50)
-  parola       String
+  parola         String
 
   userSubscription UserSubscription[]
+  writtenEntries    WrittenEntry[]    // Relație inversă către WrittenEntry
+  audioEntries      AudioEntry[]      // Relație inversă către AudioEntry
 }
-model Membership{
-  id          Int     @id @default(autoincrement()) 
-  tipMembership  TipMembership
+
+model Membership {
+  id                   Int          @id @default(autoincrement()) 
+  tipMembership        TipMembership
   nr_maxim_intrari_Scrise Int
   nr_maxim_intrari_Audio Int
 
   userSubscription UserSubscription[]
 }
+
 model UserSubscription {
   id                  Int           @id @default(autoincrement()) 
-  userId              Int                                        
-  membershipId  Int                                        
+  userId              Int                                      
+  membershipId        Int                                       
          
-  createdAt           DateTime            @default(now())        
-  updatedAt           DateTime            @default(now()) @updatedAt 
+  createdAt           DateTime      @default(now())        
+  updatedAt           DateTime      @default(now()) @updatedAt 
 
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  membership          Membership         @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membership          Membership    @relation(fields: [membershipId], references: [id], onDelete: Cascade)
 }
 
-  enum TipMembership {
+model WrittenEntry {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  content      String    @db.Text
+  createdAt    DateTime  @default(now())
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AudioEntry {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  fileUrl      String    // URL către fișierul audio
+  duration     Int       // Durata în secunde
+  createdAt    DateTime  @default(now())
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum TipMembership {
   gratuit
   standard
   premium
-  }
+}
 

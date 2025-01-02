@@ -10,6 +10,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+
   // Activează CORS
   app.enableCors(); // Permite toate originile (sau configurează specific)
   console.log('CORS enabled');

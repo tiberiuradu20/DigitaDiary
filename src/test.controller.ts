@@ -1,16 +1,18 @@
 import { Controller, Get } from '@nestjs/common';
 import { TestService } from './test.service';
+import { WinstonLogger } from './infrastructure/winston.logger'; // Importăm logger-ul Winston
 
 @Controller('test')
 export class TestController {
   constructor(private readonly testService: TestService) {
-    console.log("TestController was called ")
+    WinstonLogger.info('TestController was initialized'); // Log la inițializare
   }
 
   @Get()
   getInstanceId() {
-    // Returnează ID-ul unic al instanței serviciului
-    console.log("GET /test was called")
-    return { id: this.testService.getId() };
+    WinstonLogger.debug('GET /test was called'); // Log pentru apelul rutei
+    const instanceId = this.testService.getId();
+    WinstonLogger.info(`Instance ID returned: ${instanceId}`); // Log pentru rezultat
+    return { id: instanceId };
   }
 }
