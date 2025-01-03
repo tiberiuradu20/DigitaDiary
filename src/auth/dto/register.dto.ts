@@ -1,5 +1,4 @@
-import { IsEmail, IsString} from "class-validator";
-
+import { IsEmail, IsString, IsOptional } from "class-validator";
 
 export class RegisterDto {
   @IsString()
@@ -11,10 +10,10 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 
+  @IsOptional() // Fă câmpul opțional
   @IsString()
-  membershipId: string;
+  membershipId?: string;
 
   @IsString()
   parola: string;
-
 }

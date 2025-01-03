@@ -45,25 +45,30 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
-
   async register(registerDto: RegisterDto) {
+    console.log("Date primite pentru înregistrare:", registerDto);
+  
     const { email, parola, nume, prenume } = registerDto;
-
+  
+    if (!parola) {
+      throw new Error("Parola nu a fost furnizată.");
+    }
+  
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
-
+  
     if (existingUser) {
       throw new BadRequestException("Email-ul este deja folosit");
     }
-
+  
     const parolaHash = await bcrypt.hash(parola, 10);
     return this.prisma.user.create({
       data: {
         nume,
         prenume,
         email,
-        parola: parolaHash
+        parola: parolaHash,
       },
     });
   }

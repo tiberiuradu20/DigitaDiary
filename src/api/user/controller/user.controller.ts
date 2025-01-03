@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   InternalServerErrorException,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { UserService } from "../service/user.service";
@@ -18,6 +19,36 @@ import { AuthGuard } from "@nestjs/passport";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(AuthGuard("jwt"))
+  @Get(":id/membership")
+  async getUserMembership(@Param("id") id: string) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+      throw new BadRequestException("User ID is invalid.");
+    }
+
+    const membership = await this.userService.getUserMembership(userId);
+    if (!membership) {
+      throw new NotFoundException("Membership not found for this user.");
+    }
+
+    return { membership };
+  }
+  @UseGuards(AuthGuard("jwt"))
+  @Get("/id-by-email")
+  async getUserIdByEmail(@Query("email") email: string) {
+    console.log("Controller: Fetching user ID by email...");
+    if (!email) {
+      throw new BadRequestException("Email-ul este necesar.");
+    }
+
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException("Utilizatorul nu a fost găsit.");
+    }
+
+    return { userId: user.id };
+  }
   @UseGuards(AuthGuard("jwt"))
   @Get()
   async findAll() {
@@ -43,6 +74,8 @@ export class UserController {
 
     return { user };
   }
+
+ 
 
   @UseGuards(AuthGuard("jwt"))
   @Patch(":id")

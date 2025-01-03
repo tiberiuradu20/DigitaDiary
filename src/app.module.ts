@@ -6,7 +6,7 @@ import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { TestModule } from 'test.module';
 @Module({
   imports: [
-    TenantModule,         // Modulul pentru gestionarea chiriașilor (tenants)
+    TenantModule,         
     ApiModule,            // Modulul API pentru utilizatori și membership
     AuthModule,           // Modulul pentru autentificare
     InfrastructureModule,
